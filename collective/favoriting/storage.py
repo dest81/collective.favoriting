@@ -109,5 +109,6 @@ class FavoritingManager(BrowserView):
 
 @indexer(interface.Interface)
 def favoritedby(context):
-    storage = IFavoritingStorage(context)
-    return storage.favoritedby
+    storage = component.queryAdapter(context, IFavoritingStorage, default=None)
+    if storage:
+        return storage.favoritedby

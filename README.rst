@@ -15,12 +15,12 @@ Badges
     :target: https://crate.io/packages/collective.favoriting/
     :alt: Number of PyPI downloads
 
-.. image:: https://secure.travis-ci.org/toutpt/collective.favoriting.png
-    :target: http://travis-ci.org/#!/toutpt/collective.favoriting
+.. image:: https://secure.travis-ci.org/collective/collective.favoriting.png
+    :target: http://travis-ci.org/#!/collective/collective.favoriting
 
-.. image:: https://coveralls.io/repos/toutpt/collective.favoriting/badge.png?branch=master
+.. image:: https://coveralls.io/repos/collective/collective.favoriting/badge.png?branch=master
     :alt: Coverage
-    :target: https://coveralls.io/r/toutpt/collective.favoriting
+    :target: https://coveralls.io/r/collective/collective.favoriting
 
 
 How it works
