@@ -16,8 +16,10 @@ class IFavoritingManager(interface.Interface):
     context = schema.Object(title=u"Context", schema=IContentish)
     request = schema.Object(title=u"Request", schema=IRequest)
 
-    def get():
-        """Return the list of all content favorited by the current user"""
+    def get(query=None):
+        """Return the list of all content favorited by the current user.
+        'query' is an optional dict that will be passed to the catalog search
+        """
 
     def add():
         """add the current context to the favorites of the current user"""
@@ -85,9 +87,12 @@ class FavoritingManager(BrowserView):
         if self.storage is None:
             self.storage = IFavoritingStorage(self.context)
 
-    def get(self):
+    def get(self, query=None):
         self.update()
-        query = {"favoritedby": self.userid}
+        if query is None:
+            query = {"favoritedby": self.userid}
+        else:
+            query["favoritedby"] = self.userid
         favorites = self.catalog(**query)
         return favorites
 
@@ -95,6 +100,7 @@ class FavoritingManager(BrowserView):
         self.update()
         self.storage.favoritedby.append(self.userid)
         self.context.reindexObject(idxs=["favoritedby"])
+        #TODO: add notify for ZODB cache
 
     def rm(self):
         self.update()
