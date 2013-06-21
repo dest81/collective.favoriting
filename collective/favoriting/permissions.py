@@ -1,7 +1,7 @@
 from AccessControl.SecurityInfo import ModuleSecurityInfo
 from Products.CMFCore.permissions import setDefaultRoles
 
-security = ModuleSecurityInfo('Products.CMFCore.permissions')
+security = ModuleSecurityInfo('collective.favoriting')
 
 security.declarePublic('AddToFavorites')
 AddToFavorites = 'collective.favoriting: Add'
