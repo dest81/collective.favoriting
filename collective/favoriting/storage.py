@@ -27,7 +27,7 @@ class IFavoritingManager(interface.Interface):
     def rm():
         """Remove the current context from the favorites."""
 
-    def isIn():
+    def isin():
         """Return True if the current context is in the favorites of the
         current user"""
 
