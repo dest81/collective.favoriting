@@ -85,7 +85,10 @@ class FavoritingManager(BrowserView):
             if user:
                 self.userid = user.getId()
         if self.storage is None:
-            self.storage = IFavoritingStorage(self.context)
+            try:
+                self.storage = IFavoritingStorage(self.context)
+            except:
+                pass
 
     def get(self, query=None):
         self.update()
@@ -113,7 +116,7 @@ class FavoritingManager(BrowserView):
         return self.userid in self.storage.favoritedby
 
 
-@indexer(interface.Interface)
+@indexer(IContentish)
 def favoritedby(context):
     storage = component.queryAdapter(context, IFavoritingStorage, default=None)
     if storage:
