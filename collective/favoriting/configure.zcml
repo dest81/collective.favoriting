@@ -22,6 +22,20 @@
       />
   <include file="upgrades.zcml" />
 
+  <!-- Triggers -->
+
+  <interface
+      interface=".event.IFavoritedEvent"
+      type="plone.contentrules.rule.interfaces.IRuleEventType"
+      name="Object favorited"
+      />
+
+  <interface
+      interface=".event.IUnfavoritedEvent"
+      type="plone.contentrules.rule.interfaces.IRuleEventType"
+      name="Object unfavorited"
+      />
+
   <interface
       interface=".layer.Layer"
       name="collective.favoriting"
