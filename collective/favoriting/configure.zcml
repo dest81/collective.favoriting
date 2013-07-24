@@ -9,8 +9,11 @@
     xmlns:zcml="http://namespaces.zope.org/zcml"
     i18n_domain="collective.favoriting">
 
+  <five:registerPackage package="." />
+
   <include file="permissions.zcml" />
   <include package=".browser" />
+  <include package=".actions" />
   <i18n:registerTranslations directory="locales" />
 
   <genericsetup:registerProfile
