@@ -39,6 +39,17 @@
       name="Object unfavorited"
       />
 
+  <subscriber
+      for=".event.IFavoritedEvent"
+      handler=".triggers_handlers.favorited"
+      />
+
+  <subscriber
+      for=".event.IUnfavoritedEvent"
+      handler=".triggers_handlers.unfavorited"
+      />
+
+
   <interface
       interface=".layer.Layer"
       name="collective.favoriting"

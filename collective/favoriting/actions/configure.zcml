@@ -1,0 +1,38 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    xmlns:five="http://namespaces.zope.org/five"
+    >
+
+  <include package="plone.app.contentrules" />
+
+  <adapter factory=".favoriting.FavoritingActionExecutor" />
+
+  <browser:page
+      for="plone.app.contentrules.browser.interfaces.IRuleActionAdding"
+      name="collective.favoriting.actions.Favoriting"
+      class=".favoriting.FavoritingActionAddForm"
+      permission="cmf.ManagePortal"
+      />
+
+  <browser:page
+      for="collective.favoriting.actions.favoriting.IFavoritingAction"
+      name="edit"
+      class=".favoriting.FavoritingActionEditForm"
+      permission="cmf.ManagePortal"
+      />
+
+  <plone:ruleAction
+      name="collective.favoriting.actions.Favoriting"
+      title="Add or remove an object from a user's favorites"
+      description="Add or remove an object from a user's favorites"
+      for="*"
+      event="zope.component.interfaces.IObjectEvent"
+      addview="collective.favoriting.actions.Favoriting"
+      editview="edit"
+      schema=".favoriting.IFavoritingAction"
+      factory=".favoriting.FavoritingAction"
+      />
+
+</configure>
