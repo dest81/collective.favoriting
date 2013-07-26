@@ -28,25 +28,25 @@
   <!-- Triggers -->
 
   <interface
-      interface=".event.IFavoritedEvent"
+      interface=".event.IAddedToFavoritesEvent"
       type="plone.contentrules.rule.interfaces.IRuleEventType"
-      name="Object favorited"
+      name="Object added to favorites"
       />
 
   <interface
-      interface=".event.IUnfavoritedEvent"
+      interface=".event.IRemovedFromFavoritesEvent"
       type="plone.contentrules.rule.interfaces.IRuleEventType"
-      name="Object unfavorited"
+      name="Object removed from favorites"
       />
 
   <subscriber
-      for=".event.IFavoritedEvent"
-      handler=".triggers_handlers.favorited"
+      for=".event.IAddedToFavoritesEvent"
+      handler=".triggers_handlers.addedToFavorites"
       />
 
   <subscriber
-      for=".event.IUnfavoritedEvent"
-      handler=".triggers_handlers.unfavorited"
+      for=".event.IRemovedFromFavoritesEvent"
+      handler=".triggers_handlers.removedFromFavorites"
       />
 
 

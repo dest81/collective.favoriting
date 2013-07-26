@@ -3,17 +3,17 @@ from zope.component.interfaces import IObjectEvent
 from zope import interface
 
 
-class IFavoritedEvent(IObjectEvent):
+class IAddedToFavoritesEvent(IObjectEvent):
     pass
 
 
-class FavoritedEvent(ObjectEvent):
-    interface.implements(IFavoritedEvent)
+class AddedToFavoritesEvent(ObjectEvent):
+    interface.implements(IAddedToFavoritesEvent)
 
 
-class IUnfavoritedEvent(IObjectEvent):
+class IRemovedFromFavoritesEvent(IObjectEvent):
     pass
 
 
-class UnfavoritedEvent(ObjectEvent):
-    interface.implements(IUnfavoritedEvent)
+class RemovedFromFavoritesEvent(ObjectEvent):
+    interface.implements(IRemovedFromFavoritesEvent)

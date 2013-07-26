@@ -10,8 +10,8 @@ from Products.CMFCore.interfaces._content import IContentish
 from plone.indexer import indexer
 from zope.annotation.interfaces import IAttributeAnnotatable
 
-from .event import FavoritedEvent
-from .event import UnfavoritedEvent
+from .event import AddedToFavoritesEvent
+from .event import RemovedFromFavoritesEvent
 
 
 class IFavoritingManager(interface.Interface):
@@ -107,7 +107,7 @@ class FavoritingManager(BrowserView):
         self.update()
         self.storage.favoritedby.append(self.userid)
         self.context.reindexObject(idxs=["favoritedby"])
-        event.notify(FavoritedEvent(self.context))
+        event.notify(AddedToFavoritesEvent(self.context))
         #TODO: add notify for ZODB cache
 
     def rm(self):
@@ -115,7 +115,7 @@ class FavoritingManager(BrowserView):
         if self.isin():
             self.storage.favoritedby.remove(self.userid)
             self.context.reindexObject(idxs=["favoritedby"])
-            event.notify(UnfavoritedEvent(self.context))
+            event.notify(RemovedFromFavoritesEvent(self.context))
 
     def isin(self):
         self.update()

@@ -26,7 +26,7 @@ class FavoritingAction(SimpleItem):
 
     favoriting = 'favorite'
     element = 'collective.favoriting.actions.Favoriting'
-    summary = _(u'Change if the object is favorited or not.')
+    summary = _(u'Change if the object is in the user\'s favorites or not.')
 
 
 class FavoritingActionExecutor(object):

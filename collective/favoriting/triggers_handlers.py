@@ -1,11 +1,11 @@
 from plone.app.contentrules.handlers import execute
 
 
-def favorited(event):
+def addedToFavorites(event):
     obj = event.object
     execute(obj, event)
 
 
-def unfavorited(event):
+def removedFromFavorites(event):
     obj = event.object
     execute(obj, event)
