@@ -14,10 +14,16 @@ class Add(BrowserView):
             manager.add()
             status = IStatusMessage(self.request)
             status.add(_(u"Added to favorite"))
-        self.request.response.redirect(self.context.absolute_url())
+        self.request.response.redirect(self.nextURL())
+
+    def nextURL(self):
+        referer = self.request.get("HTTP_REFERER")
+        if not referer:
+            referer = self.context.absolute_url()
+        return referer
 
 
-class Rm(BrowserView):
+class Rm(Add):
     """Rm from favorite"""
     def __call__(self):
         manager = self.context.restrictedTraverse(VIEW_NAME)
@@ -25,7 +31,7 @@ class Rm(BrowserView):
             manager.rm()
             status = IStatusMessage(self.request)
             status.add(_(u"Removed from favorite"))
-        self.request.response.redirect(self.context.absolute_url())
+        self.request.response.redirect(self.nextURL())
 
 
 class Isin(BrowserView):
