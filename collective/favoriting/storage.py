@@ -35,6 +35,12 @@ class IFavoritingManager(interface.Interface):
         """Return True if the current context is in the favorites of the
         current user"""
 
+    def how_many():
+        """return the number of stars for this item"""
+
+    def who_stars_it():
+        """return the list of userid who stars this item"""
+
 
 class IFavoritingStorage(interface.Interface):
     """a list of all user who have favoriting this object"""
@@ -120,6 +126,14 @@ class FavoritingManager(BrowserView):
     def isin(self):
         self.update()
         return self.userid in self.storage.favoritedby
+
+    def how_many(self):
+        self.update()
+        return len(self.storage.favoritedby)
+
+    def who_stars_it():
+        self.update()
+        return list(set(self.storage.favoritedby))
 
 
 @indexer(IContentish)
