@@ -106,6 +106,9 @@ class FavoritingManager(BrowserView):
             query = {"favoritedby": self.userid}
         else:
             query["favoritedby"] = self.userid
+        if 'sort_on' not in query.keys():
+            query['sort_on'] = 'sortable_title'
+            query['sort_order'] = 'ascending'
         favorites = self.catalog(**query)
         return favorites
 
