@@ -18,7 +18,7 @@ class IFavoritingAction(interface.Interface):
     favoriting = schema.Choice(
         title=_(u"Change favoriting"),
         vocabulary=favoritingChoice
-        )
+    )
 
 
 class FavoritingAction(SimpleItem):
