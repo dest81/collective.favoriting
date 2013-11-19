@@ -72,7 +72,7 @@ class TestSetup(base.IntegrationTestCase):
             u'string:${globals_view/navigationRootUrl}/@@favoriting_view'
         )
         self.assertEqual(
-            action_info['permissions'], ('collective.favoriting: Add',),
+            action_info['permissions'], ('View',),
         )
         self.assertIsNone(action_info['link_target'])
         self.assertEqual(action_info['id'], 'favoriting_view')
