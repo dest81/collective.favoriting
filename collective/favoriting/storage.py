@@ -134,7 +134,7 @@ class FavoritingManager(BrowserView):
         self.update()
         return len(self.storage.favoritedby)
 
-    def who_stars_it():
+    def who_stars_it(self):
         self.update()
         return list(set(self.storage.favoritedby))
 
