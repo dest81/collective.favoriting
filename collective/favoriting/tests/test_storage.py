@@ -15,12 +15,10 @@ class TestStorage(base.IntegrationTestCase):
         self.assertIsNone(self.storage.catalog)
         self.assertIsNone(self.storage.membership)
         self.assertIsNone(self.storage.userid)
-        self.assertIsNone(self.storage.storage)
         self.storage.update()
         self.assertIsNotNone(self.storage.catalog)
         self.assertIsNotNone(self.storage.membership)
         self.assertIsNotNone(self.storage.userid)
-        self.assertIsNotNone(self.storage.storage)
 
     def test_add_and_get_and_rm(self):
         self.assertEqual(len(self.storage.get()), 0)

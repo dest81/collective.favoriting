@@ -1,17 +1,19 @@
-from zope import component
 from zope import event
 from zope import interface
 from zope import schema
-from zope.annotation import factory
-from Products.Five.browser import BrowserView
-from Products.CMFCore.utils import getToolByName
+from zope.annotation.interfaces import IAnnotations
 from zope.publisher.interfaces import IRequest
+from persistent.list import PersistentList
+
+from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.interfaces._content import IContentish
+from Products.Five.browser import BrowserView
 from plone.indexer import indexer
-from zope.annotation.interfaces import IAttributeAnnotatable
 
 from .event import AddedToFavoritesEvent
 from .event import RemovedFromFavoritesEvent
+
+FAVBY = "collective.favoriting.favoritedby"
 
 
 class IFavoritingManager(interface.Interface):
@@ -42,27 +44,63 @@ class IFavoritingManager(interface.Interface):
         """return the list of userid who stars this item"""
 
 
-class IFavoritingStorage(interface.Interface):
-    """a list of all user who have favoriting this object"""
-    favoritedby = schema.List(
-        title=u"Favorited by",
-        value_type=schema.TextLine(title=u"User ID")
-    )
+def setupAnnotations(context):
+    """
+    set up the annotations if they haven't been set up
+    already. The rest of the functions in here assume that
+    this has already been set up
+    """
+    annotations = IAnnotations(context)
+
+    if not FAVBY in annotations:
+        annotations[FAVBY] = PersistentList()
+
+    return annotations
 
 
-class FavoritingStorage(object):
-    interface.implements(IFavoritingStorage)
-    component.adapts(IAttributeAnnotatable)
+def add_to_favorites(context, userid=None):
+    """
+    """
+    annotations = setupAnnotations(context)
+    if userid is None:
+        mtool = getToolByName(context, 'portal_membership')
+        userid = mtool.getAuthenticatedMember().id
 
-    def __init__(self):
-        """
-        Note that the annotation implementation does not expect any arguments
-        to its `__init__`. Otherwise it's basically an adapter.
-        """
-        self.favoritedby = []
+    if userid not in annotations[FAVBY]:
+        annotations[FAVBY].append(userid)
 
 
-FavoritingStorageFactory = factory(FavoritingStorage)
+def remove_from_favorites(context, userid=None):
+    """
+    """
+    annotations = IAnnotations(context)
+    if userid is None:
+        mtool = getToolByName(context, 'portal_membership')
+        userid = mtool.getAuthenticatedMember().id
+
+    if userid in annotations.get(FAVBY, []):
+        annotations[FAVBY].remove(userid)
+
+
+def is_in_favorites(context, userid=None):
+    """
+    """
+    userids = who_favorites(context)
+    if userid is None:
+        mtool = getToolByName(context, 'portal_membership')
+        userid = mtool.getAuthenticatedMember().id
+
+    return userid in userids
+
+
+def how_many_favorites(context):
+    userids = who_favorites(context)
+    return len(userids)
+
+
+def who_favorites(context):
+    annotations = IAnnotations(context)
+    return annotations.get(FAVBY, [])
 
 
 class FavoritingManager(BrowserView):
@@ -76,7 +114,6 @@ class FavoritingManager(BrowserView):
         self.membership = None
         self.catalog = None
         self.favorites = []
-        self.storage = None
 
     def __call__(self):
         self.update()
@@ -94,11 +131,6 @@ class FavoritingManager(BrowserView):
             user = self.membership.getAuthenticatedMember()
             if user:
                 self.userid = user.getId()
-        if self.storage is None:
-            try:
-                self.storage = IFavoritingStorage(self.context)
-            except:
-                pass
 
     def get(self, query=None):
         self.update()
@@ -114,7 +146,8 @@ class FavoritingManager(BrowserView):
 
     def add(self):
         self.update()
-        self.storage.favoritedby.append(self.userid)
+        #self.storage.favoritedby.append(self.userid)
+        add_to_favorites(self.context, userid=self.userid)
         self.context.reindexObject(idxs=["favoritedby"])
         event.notify(AddedToFavoritesEvent(self.context))
         #TODO: add notify for ZODB cache
@@ -122,25 +155,28 @@ class FavoritingManager(BrowserView):
     def rm(self):
         self.update()
         if self.isin():
-            self.storage.favoritedby.remove(self.userid)
+            remove_from_favorites(self.context, userid=self.userid)
             self.context.reindexObject(idxs=["favoritedby"])
             event.notify(RemovedFromFavoritesEvent(self.context))
 
     def isin(self):
         self.update()
-        return self.userid in self.storage.favoritedby
+        return is_in_favorites(self.context, userid=self.userid)
 
     def how_many(self):
         self.update()
-        return len(self.storage.favoritedby)
+        return how_many_favorites(self.context)
 
     def who_stars_it(self):
         self.update()
-        return list(set(self.storage.favoritedby))
+        return list(set(who_favorites(self.context)))
 
 
 @indexer(IContentish)
 def favoritedby(context):
-    storage = component.queryAdapter(context, IFavoritingStorage, default=None)
-    if storage:
-        return storage.favoritedby
+    return who_favorites(context)
+
+
+#BBB
+class FavoritingStorage(object):
+    pass

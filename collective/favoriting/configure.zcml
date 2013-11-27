@@ -61,7 +61,6 @@
       layer=".layer.Layer"
       permission="zope2.View"
       />
-  <adapter factory=".storage.FavoritingStorageFactory"/>
   <adapter factory=".storage.favoritedby" name="favoritedby" />
 
 </configure>
