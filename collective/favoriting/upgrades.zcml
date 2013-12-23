@@ -20,4 +20,13 @@
         handler=".upgrades.cleanup_annotations"
         />
 
+    <upgradeStep
+        source="1003"
+        destination="1004"
+        title="Upgrade"
+        description=""
+        profile="collective.favoriting:default"
+        handler=".upgrades.common"
+        />
+
 </configure>
