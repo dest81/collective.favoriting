@@ -9,7 +9,7 @@
    <property name="icon_expr"></property>
    <property name="available_expr">not:object/@@collective.favoriting/isin</property>
    <property name="permissions">
-    <element value="collective.favoriting: Add"/>
+    <element value="View"/>
    </property>
    <property name="visible">True</property>
   </object>
@@ -20,7 +20,7 @@
    <property name="icon_expr"></property>
    <property name="available_expr">object/@@collective.favoriting/isin</property>
    <property name="permissions">
-    <element value="collective.favoriting: Add"/>
+    <element value="View"/>
    </property>
    <property name="visible">True</property>
   </object>

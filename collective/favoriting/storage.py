@@ -64,7 +64,12 @@ def add_to_favorites(context, userid=None):
     annotations = setupAnnotations(context)
     if userid is None:
         mtool = getToolByName(context, 'portal_membership')
-        userid = mtool.getAuthenticatedMember().id
+        if mtool.isAnonymousUser():
+            sdm = context.session_data_manager
+            session_id = sdm.getBrowserIdManager().getBrowserId(create=False)
+            userid = session_id
+        else:
+            userid = mtool.getAuthenticatedMember().id
 
     if userid not in annotations[FAVBY]:
         annotations[FAVBY].append(userid)
@@ -76,7 +81,12 @@ def remove_from_favorites(context, userid=None):
     annotations = IAnnotations(context)
     if userid is None:
         mtool = getToolByName(context, 'portal_membership')
-        userid = mtool.getAuthenticatedMember().id
+        if mtool.isAnonymousUser():
+            sdm = context.session_data_manager
+            session_id = sdm.getBrowserIdManager().getBrowserId(create=False)
+            userid = session_id
+        else:
+            userid = mtool.getAuthenticatedMember().id
 
     if userid in annotations.get(FAVBY, []):
         annotations[FAVBY].remove(userid)
@@ -88,7 +98,12 @@ def is_in_favorites(context, userid=None):
     userids = who_favorites(context)
     if userid is None:
         mtool = getToolByName(context, 'portal_membership')
-        userid = mtool.getAuthenticatedMember().id
+        if mtool.isAnonymousUser():
+            sdm = context.session_data_manager
+            session_id = sdm.getBrowserIdManager().getBrowserId(create=False)
+            userid = session_id
+        else:
+            userid = mtool.getAuthenticatedMember().id
 
     return userid in userids
 
@@ -128,9 +143,15 @@ class FavoritingManager(BrowserView):
         if self.membership is None:
             self.membership = getToolByName(context, 'portal_membership')
         if self.userid is None:
-            user = self.membership.getAuthenticatedMember()
-            if user:
-                self.userid = user.getId()
+            mtool = getToolByName(context, 'portal_membership')
+            if mtool.isAnonymousUser():
+                sdm = self.context.session_data_manager
+                session_id = sdm.getBrowserIdManager().getBrowserId(create=False)
+                self.userid = session_id
+            else:
+                user = self.membership.getAuthenticatedMember()
+                if user:
+                    self.userid = user.getId()
 
     def get(self, query=None):
         self.update()

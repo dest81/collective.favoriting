@@ -20,20 +20,43 @@
       name="favoriting_add"
       class=".favoriting_view.Add"
       layer="collective.favoriting.layer.Layer"
-      permission="collective.favoriting.add"
+      permission="zope2.View"
       />
   <browser:page
       for="Products.CMFCore.interfaces._content.IContentish"
       name="favoriting_isin"
       class=".favoriting_view.Isin"
       layer="collective.favoriting.layer.Layer"
-      permission="collective.favoriting.add"
+      permission="zope2.View"
       />
   <browser:page
       for="Products.CMFCore.interfaces._content.IContentish"
       name="favoriting_rm"
       class=".favoriting_view.Rm"
       layer="collective.favoriting.layer.Layer"
-      permission="collective.favoriting.add"
+      permission="zope2.View"
       />
+
+  <browser:page
+      for="Products.CMFCore.interfaces._content.IContentish"
+      name="favoriting_add_ajax"
+      class=".favoriting_view.AddAjax"
+      layer="collective.favoriting.layer.Layer"
+      permission="zope2.View"
+      />
+  <browser:page
+      for="Products.CMFCore.interfaces._content.IContentish"
+      name="favoriting_isin_ajax"
+      class=".favoriting_view.IsinAjax"
+      layer="collective.favoriting.layer.Layer"
+      permission="zope2.View"
+      />
+  <browser:page
+      for="Products.CMFCore.interfaces._content.IContentish"
+      name="favoriting_rm_ajax"
+      class=".favoriting_view.RmAjax"
+      layer="collective.favoriting.layer.Layer"
+      permission="zope2.View"
+      />
+
 </configure>

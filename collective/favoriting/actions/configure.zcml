@@ -13,14 +13,14 @@
       for="plone.app.contentrules.browser.interfaces.IRuleActionAdding"
       name="collective.favoriting.actions.Favoriting"
       class=".favoriting.FavoritingActionAddForm"
-      permission="cmf.ManagePortal"
+      permission="zope2.View"
       />
 
   <browser:page
       for="collective.favoriting.actions.favoriting.IFavoritingAction"
       name="edit"
       class=".favoriting.FavoritingActionEditForm"
-      permission="cmf.ManagePortal"
+      permission="zope2.View"
       />
 
   <plone:ruleAction
