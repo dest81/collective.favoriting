@@ -66,7 +66,7 @@ def add_to_favorites(context, userid=None):
         mtool = getToolByName(context, 'portal_membership')
         if mtool.isAnonymousUser():
             sdm = context.session_data_manager
-            session_id = sdm.getBrowserIdManager().getBrowserId(create=False)
+            session_id = sdm.getBrowserIdManager().getBrowserId()
             userid = session_id
         else:
             userid = mtool.getAuthenticatedMember().id
@@ -146,7 +146,7 @@ class FavoritingManager(BrowserView):
             mtool = getToolByName(context, 'portal_membership')
             if mtool.isAnonymousUser():
                 sdm = self.context.session_data_manager
-                session_id = sdm.getBrowserIdManager().getBrowserId(create=False)
+                session_id = sdm.getBrowserIdManager().getBrowserId()
                 self.userid = session_id
             else:
                 user = self.membership.getAuthenticatedMember()
