@@ -14,6 +14,7 @@ from .event import AddedToFavoritesEvent
 from .event import RemovedFromFavoritesEvent
 
 FAVBY = "collective.favoriting.favoritedby"
+CN = 'favorite_list'
 
 
 class IFavoritingManager(interface.Interface):
@@ -58,53 +59,63 @@ def setupAnnotations(context):
     return annotations
 
 
-def add_to_favorites(context, userid=None):
+def add_to_favorites(request, context, userid=None):
     """
     """
     annotations = setupAnnotations(context)
     if userid is None:
         mtool = getToolByName(context, 'portal_membership')
         if mtool.isAnonymousUser():
-            sdm = context.session_data_manager
-            session_id = sdm.getBrowserIdManager().getBrowserId()
-            userid = session_id
+            cookie_list = request.cookies.get(CN) or []
+            if cookie_list:
+                cookie_list = cookie_list.split(',')
+            cookie_list.append(context.UID())
+            request.response.setCookie(CN, ','.join(cookie_list), path='/')
+            return
         else:
             userid = mtool.getAuthenticatedMember().id
 
     if userid not in annotations[FAVBY]:
         annotations[FAVBY].append(userid)
+    context.reindexObject(idxs=["favoritedby"])
 
 
-def remove_from_favorites(context, userid=None):
+def remove_from_favorites(request, context, userid=None):
     """
     """
     annotations = IAnnotations(context)
     if userid is None:
         mtool = getToolByName(context, 'portal_membership')
         if mtool.isAnonymousUser():
-            sdm = context.session_data_manager
-            session_id = sdm.getBrowserIdManager().getBrowserId(create=False)
-            userid = session_id
+            cookie_list = request.cookies.get(CN) or []
+            if cookie_list:
+                cookie_list = cookie_list.split(',')
+            cookie_list.remove(context.UID())
+            request.response.setCookie(CN, ','.join(cookie_list), path='/')
+            return
         else:
             userid = mtool.getAuthenticatedMember().id
 
     if userid in annotations.get(FAVBY, []):
         annotations[FAVBY].remove(userid)
+    context.reindexObject(idxs=["favoritedby"])
 
 
-def is_in_favorites(context, userid=None):
+def is_in_favorites(request, context, userid=None):
     """
     """
-    userids = who_favorites(context)
+
     if userid is None:
         mtool = getToolByName(context, 'portal_membership')
         if mtool.isAnonymousUser():
-            sdm = context.session_data_manager
-            session_id = sdm.getBrowserIdManager().getBrowserId(create=False)
-            userid = session_id
+            cookie_list = request.cookies.get(CN) or []
+            if cookie_list:
+                cookie_list = cookie_list.split(',')
+            return context.UID() in cookie_list
         else:
             userid = mtool.getAuthenticatedMember().id
 
+    userids = who_favorites(context)
     return userid in userids
 
 
@@ -144,45 +155,49 @@ class FavoritingManager(BrowserView):
             self.membership = getToolByName(context, 'portal_membership')
         if self.userid is None:
             mtool = getToolByName(context, 'portal_membership')
-            if mtool.isAnonymousUser():
-                sdm = self.context.session_data_manager
-                session_id = sdm.getBrowserIdManager().getBrowserId()
-                self.userid = session_id
-            else:
+            if not mtool.isAnonymousUser():
                 user = self.membership.getAuthenticatedMember()
                 if user:
                     self.userid = user.getId()
 
     def get(self, query=None):
         self.update()
-        if query is None:
-            query = {"favoritedby": self.userid}
+        if self.userid:
+            if query is None:
+                query = {"favoritedby": self.userid}
+            else:
+                query["favoritedby"] = self.userid
+            if 'sort_on' not in query.keys():
+                query['sort_on'] = 'sortable_title'
+                query['sort_order'] = 'ascending'
+            favorites = self.catalog(**query)
         else:
-            query["favoritedby"] = self.userid
-        if 'sort_on' not in query.keys():
-            query['sort_on'] = 'sortable_title'
-            query['sort_order'] = 'ascending'
-        favorites = self.catalog(**query)
+            cookie_list = self.request.cookies.get(CN) or []
+            if cookie_list:
+                cookie_list = cookie_list.split(',')
+                favorites = self.catalog(UID=cookie_list)
+            else:
+                favorites = []
+
         return favorites
 
     def add(self):
         self.update()
         #self.storage.favoritedby.append(self.userid)
-        add_to_favorites(self.context, userid=self.userid)
-        self.context.reindexObject(idxs=["favoritedby"])
+        add_to_favorites(self.request, self.context, userid=self.userid)
+
         event.notify(AddedToFavoritesEvent(self.context))
         #TODO: add notify for ZODB cache
 
     def rm(self):
         self.update()
         if self.isin():
-            remove_from_favorites(self.context, userid=self.userid)
-            self.context.reindexObject(idxs=["favoritedby"])
+            remove_from_favorites(self.request, self.context, userid=self.userid)
             event.notify(RemovedFromFavoritesEvent(self.context))
 
     def isin(self):
         self.update()
-        return is_in_favorites(self.context, userid=self.userid)
+        return is_in_favorites(self.request, self.context, userid=self.userid)
 
     def how_many(self):
         self.update()
