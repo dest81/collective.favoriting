@@ -1,3 +1,4 @@
+import time
 from zope import event
 from zope import interface
 from zope import schema
@@ -10,11 +11,14 @@ from Products.CMFCore.interfaces._content import IContentish
 from Products.Five.browser import BrowserView
 from plone.indexer import indexer
 
+from email.Utils import formatdate
+
 from .event import AddedToFavoritesEvent
 from .event import RemovedFromFavoritesEvent
 
 FAVBY = "collective.favoriting.favoritedby"
 CN = 'favorite_list'
+SESSION_TIME = (30*25*60*60)
 
 
 class IFavoritingManager(interface.Interface):
@@ -70,7 +74,9 @@ def add_to_favorites(request, context, userid=None):
             if cookie_list:
                 cookie_list = cookie_list.split(',')
             cookie_list.append(context.UID())
-            request.response.setCookie(CN, ','.join(cookie_list), path='/')
+            expires = formatdate(time.time() + SESSION_TIME, usegmt=True)
+            request.response.setCookie(CN, ','.join(cookie_list),
+                                       path='/', expires=expires)
             return
         else:
             userid = mtool.getAuthenticatedMember().id
@@ -91,7 +97,9 @@ def remove_from_favorites(request, context, userid=None):
             if cookie_list:
                 cookie_list = cookie_list.split(',')
             cookie_list.remove(context.UID())
-            request.response.setCookie(CN, ','.join(cookie_list), path='/')
+            expires = formatdate(time.time() + SESSION_TIME, usegmt=True)
+            request.response.setCookie(CN, ','.join(cookie_list),
+                                       path='/', expires=expires)
             return
         else:
             userid = mtool.getAuthenticatedMember().id
@@ -183,16 +191,17 @@ class FavoritingManager(BrowserView):
 
     def add(self):
         self.update()
-        #self.storage.favoritedby.append(self.userid)
+        # self.storage.favoritedby.append(self.userid)
         add_to_favorites(self.request, self.context, userid=self.userid)
 
         event.notify(AddedToFavoritesEvent(self.context))
-        #TODO: add notify for ZODB cache
+        # TODO: add notify for ZODB cache
 
     def rm(self):
         self.update()
         if self.isin():
-            remove_from_favorites(self.request, self.context, userid=self.userid)
+            remove_from_favorites(
+                self.request, self.context, userid=self.userid)
             event.notify(RemovedFromFavoritesEvent(self.context))
 
     def isin(self):
@@ -213,6 +222,6 @@ def favoritedby(context):
     return who_favorites(context)
 
 
-#BBB
+# BBB
 class FavoritingStorage(object):
     pass
